@@ -5,7 +5,7 @@ date: "Sept 2020"
 output: github_document
 ---
 
-```{r setup}
+```{r setup, message = FALSE}
 library(tidyverse)
 library(readxl)
 ```
@@ -50,12 +50,15 @@ precip_18_df =
 precip_17_18_df =
   bind_rows(precip_17_df, precip_18_df) %>% 
   janitor::clean_names() %>% 
+  rename(precipitation = total) %>% 
   mutate(month = month.name[month])
 ```
 
 Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?
 
-**The "Mr. Trash Wheel" datasets includes information about trash collected by "Mr. Trash Wheel" - a garbage collection machine on the Baltimore waterfront as well as monthly precipitation. There are (r code) observations in the Mr. Trash Wheel dataset (one per dumpster), and (r code) observations in the precipitation dataset (one per month from 2017-2018.) Key variables in the Mr. Trash Wheel dataset include the weight and volume of the dumpsters and trash items collected. The precipitation datasets included monthly precipitation in inches. The total precipitation in 2018 was (r code). The median number of sports balls in a dumpster in 2017 was (r code).**
+**The "Mr. Trash Wheel" datasets includes information about trash collected by "Mr. Trash Wheel" - a garbage collection machine on the Baltimore waterfront as well as monthly precipitation. There are `r nrow(mr_trash_wheel_df)` observations in the Mr. Trash Wheel dataset (one per dumpster), and `r nrow(precip_17_18_df)` observations in the precipitation dataset (one per month from 2017-2018.) Key variables in the Mr. Trash Wheel dataset include the weight and volume of the dumpsters and trash items collected. The precipitation datasets included monthly precipitation in inches. The total precipitation in 2018 was `r sum(precip_18_df$Total)`. The median number of sports balls in a dumpster in 2017 was `r median(mr_trash_wheel_df$sportsballs | mr_trash_wheel_df$year==2017)` .**
+
+[[If time, address error above^]]
 
 ## Problem 2
 This problem focuses on NYC Transit data; in particular, this CSV file contains information related to each entrance and exit for each subway station in NYC.
@@ -63,12 +66,16 @@ This problem focuses on NYC Transit data; in particular, this CSV file contains 
 Read and clean the data; retain line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
 
 ```{r}
-
+nyc_transit_df = 
+  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
+  janitor::clean_names() %>% 
+  select(line, station_name, station_latitude, station_longitude, starts_with("route"), entry, vending, entrance_type, ada) %>% 
+  mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
 ```
 
 Write a short paragraph about this dataset – explain briefly what variables the dataset contains, describe your data cleaning steps so far, and give the dimension (rows x columns) of the resulting dataset. Are these data tidy?
 
-**Insert paragraph here**
+**This dataset includes variables related to subway station entrances in NYC. So far, the data have been imported, and certain variables including route, station name, ada compliance, etc, have been selected. The data are tidier, but could be tidier if there were one line per route for each station entrance. The dataset has `r ncol(nyc_transit_df)` columns and `r nrow(nyc_transit_df)` observations.**
 
 Answer the following questions using these data:
 
